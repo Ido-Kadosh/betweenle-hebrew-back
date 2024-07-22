@@ -5,7 +5,7 @@ export const getDailyWord = async (req: Request, res: Response) => {
 		const dailyWord = await gameService.getDailyWord();
 		res.json(dailyWord);
 	} catch (err) {
-		res.status(400).send({ err: 'Failed to get daily word' });
+		res.status(500).send({ err: 'Failed to get daily word' });
 	}
 };
 export const checkIsWord = async (req: Request, res: Response) => {
@@ -14,6 +14,6 @@ export const checkIsWord = async (req: Request, res: Response) => {
 		const isWord = await gameService.checkIsWord(guess as string);
 		res.json(isWord);
 	} catch (err) {
-		res.status(400).send({ err: 'Failed to check if word exists in dictionary' });
+		res.status(500).send({ err: 'Failed to check if word exists in dictionary' });
 	}
 };
