@@ -18,6 +18,15 @@ if (process.env.NODE_ENV === 'production') {
 
 app.use('/api/game', gameRoutes);
 
+app.get('/api/time-til-midnight', (req, res) => {
+	const now = new Date();
+	const midnight = new Date(now);
+	midnight.setHours(24, 0, 0, 0);
+
+	const timeTilMidnight = midnight.getTime() - now.getTime(); // Time in milliseconds
+	res.json(timeTilMidnight);
+});
+
 app.get('/**', (req, res) => {
 	res.sendFile(path.resolve(__dirname, 'public', 'index.html'));
 });
