@@ -1,7 +1,6 @@
 import fs from 'fs';
 import { createClient } from 'redis';
 import { logger } from '../../services/logger.service';
-
 const FILE_PATH = process.env.WORDS_PATH || './data/output.txt';
 
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
