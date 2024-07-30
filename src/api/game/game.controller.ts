@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { gameService } from './game.service';
-export const getDailyWord = async (req: Request, res: Response) => {
+export const getDailyData = async (req: Request, res: Response) => {
 	try {
-		const dailyWord = await gameService.getDailyWord();
-		res.json(dailyWord);
+		const dailyData = await gameService.getDailyData();
+		res.json(dailyData);
 	} catch (err) {
 		res.status(500).send({ err: 'Failed to get daily word' });
 	}

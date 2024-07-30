@@ -4,7 +4,7 @@ const path = require('path');
 
 // Input and output file paths
 const inputFilePath = './data/all_with_fatverb.txt';
-const outputFilePath = './data/output.txt';
+const outputFilePath = './data/words.txt';
 
 const fileExtension = path.extname(inputFilePath);
 
