@@ -3,7 +3,7 @@ const readline = require('readline');
 const path = require('path');
 
 // Input and output file paths
-const inputFilePath = './data/all_with_fatverb.txt';
+const inputFilePath = './data/all_append_fatverb_after_append_some_prefixes.txt';
 const outputFilePath = './data/words.txt';
 
 const fileExtension = path.extname(inputFilePath);
