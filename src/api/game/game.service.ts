@@ -1,10 +1,10 @@
 import fs from 'fs';
 import { createClient } from 'redis';
 import { logger } from '../../services/logger.service';
-import path from 'path';
 
-const FILE_PATH = process.env.WORDS_PATH || './data/words.txt';
+const WORDS_PATH = process.env.WORDS_PATH || './data/words.txt';
 const USED_WORDS_PATH = process.env.USED_WORDS_PATH || './data/used_words.txt';
+const UNUSED_WORDS_PATH = process.env.UNUSED_WORDS_PATH || './data/unused_words.txt';
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 
 const client = createClient({
@@ -13,20 +13,11 @@ const client = createClient({
 
 const checkIsWord = (guess: string) => {
 	return new Promise((resolve, reject) => {
-		fs.readFile(FILE_PATH, 'utf8', (err, data) => {
+		fs.readFile(WORDS_PATH, 'utf8', (err, data) => {
 			if (err) {
 				return reject(err);
 			}
-			if (data.includes(guess)) {
-				return resolve(true);
-			}
-
-			fs.readFile(USED_WORDS_PATH, 'utf8', (err, usedData) => {
-				if (err) {
-					return reject(err);
-				}
-				resolve(usedData.includes(guess));
-			});
+			return resolve(data.includes(guess));
 		});
 	});
 };
@@ -54,6 +45,42 @@ const getDailyData = async () => {
 	}
 };
 
+const calculateProximity = (
+	topWord: string,
+	midWord: string,
+	bottomWord: string
+): Promise<{ top: number; bottom: number }> => {
+	return new Promise((resolve, reject) => {
+		fs.readFile(WORDS_PATH, 'utf8', (err, data) => {
+			if (err) {
+				return reject(err);
+			}
+			const topWordLower = topWord.toLowerCase();
+			const midWordLower = midWord.toLowerCase();
+			const bottomWordLower = bottomWord.toLowerCase();
+
+			const words = data.toLowerCase().split(/\s+/);
+			const totalWords = words.length;
+
+			const topCount = words.filter(word => word > topWordLower && word < midWordLower).length;
+			const bottomCount = words.filter(word => word > midWordLower && word < bottomWordLower).length;
+
+			const insideRangeCount = topCount + bottomCount;
+			if (insideRangeCount === 0 || totalWords === 0) {
+				return resolve({ top: 0, bottom: 0 });
+			}
+			const topPercentage = (topCount / totalWords) * 100;
+			const bottomPercentage = (bottomCount / totalWords) * 100;
+
+			const roundNumber = (num: number) => {
+				return num < 10 ? +num.toFixed(1) : Math.round(num);
+			};
+
+			resolve({ top: roundNumber(topPercentage), bottom: roundNumber(bottomPercentage) });
+		});
+	});
+};
+
 const _getDayNumber = (): Promise<number> => {
 	return new Promise((resolve, reject) => {
 		fs.readFile(USED_WORDS_PATH, 'utf8', (err, data) => {
@@ -68,7 +95,7 @@ const _getDayNumber = (): Promise<number> => {
 
 const _getRandomWord = (): Promise<{ word: string; dayNumber: number }> => {
 	return new Promise((resolve, reject) => {
-		fs.readFile(FILE_PATH, 'utf8', (err, data) => {
+		fs.readFile(UNUSED_WORDS_PATH, 'utf8', (err, data) => {
 			if (err) {
 				return reject(err);
 			}
@@ -85,7 +112,7 @@ const _getRandomWord = (): Promise<{ word: string; dayNumber: number }> => {
 
 			words.splice(randomIndex, 1);
 
-			fs.writeFile(FILE_PATH, words.join('\n'), err => {
+			fs.writeFile(UNUSED_WORDS_PATH, words.join('\n'), err => {
 				if (err) {
 					return reject(err);
 				}
@@ -122,4 +149,5 @@ const _calculateTTL = (): number => {
 export const gameService = {
 	checkIsWord,
 	getDailyData,
+	calculateProximity,
 };

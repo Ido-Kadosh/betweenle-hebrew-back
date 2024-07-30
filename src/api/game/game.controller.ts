@@ -17,3 +17,17 @@ export const checkIsWord = async (req: Request, res: Response) => {
 		res.status(500).send({ err: 'Failed to check if word exists in dictionary' });
 	}
 };
+
+export const calculateProximity = async (req: Request, res: Response) => {
+	try {
+		const { topWord, midWord, bottomWord } = req.query;
+		const { top, bottom } = await gameService.calculateProximity(
+			topWord as string,
+			midWord as string,
+			bottomWord as string
+		);
+		res.json({ top, bottom });
+	} catch (err) {
+		res.status(500).send({ err: 'Failed to calculate proximity' });
+	}
+};
