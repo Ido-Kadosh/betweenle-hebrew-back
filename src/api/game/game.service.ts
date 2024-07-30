@@ -17,7 +17,16 @@ const checkIsWord = (guess: string) => {
 			if (err) {
 				return reject(err);
 			}
-			resolve(data.includes(guess));
+			if (data.includes(guess)) {
+				return resolve(true);
+			}
+
+			fs.readFile(USED_WORDS_PATH, 'utf8', (err, usedData) => {
+				if (err) {
+					return reject(err);
+				}
+				resolve(usedData.includes(guess));
+			});
 		});
 	});
 };
